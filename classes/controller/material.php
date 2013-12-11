@@ -101,11 +101,37 @@ class Controller_Material extends Template {
 
     public function action_add()
     {
-        if(!ACL::check('create material')){
-            //$this->request->redirect();
-            throw HTTP_Exception::factory(403, 'Access denied!');
+        $this->title = __('Add material');
+        
+        $post   = ORM::factory('material');
+        $config = Config::load('material');
+        $action = Route::get('material')->uri(array('action' => $this->request->action()));
+
+        $view = View::factory('form')
+            ->set('config',  $config)
+            ->set('action',  $action)
+            ->set('post',    $post)
+            ->bind('errors', $this->_errors);
+
+        if ($this->valid_post('material'))
+        {
+            try
+            {
+                $form = $this->request->post();
+                $post->signup($form);
+
+                Log::info('Material :title created successful.', array(':title' => $post->title));
+                Message::success(__('Material %title created successful!', array('%title' => $post->title)));
+                //заменить на переменную для каждого пользователя своя
+                $this->request->redirect(Route::get('materials')->uri(array('action' => '')));
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->_errors = $e->errors('models', TRUE);
+            }
         }
-        $this->response->body('action_add');
+
+        $this->response->body($view);
     }
 
     public function action_edit()
