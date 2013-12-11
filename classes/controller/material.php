@@ -125,18 +125,23 @@ class Controller_Material extends Template {
         }*/
         $id = (int) $this->request->param('id', 0);
         $material = ORM::factory('material', $id);
-        //замена
-        $action=Route::get('material')->uri(array(
-                                        'action' => $this->request->action(),
-                                        'id' => $material->id
-        ));
+        $material->type='material';
+        /*
         if ( ! $material->loaded())
         {
             Message::error(__("Material doesn't exists!"));
             Log::error('Attempt to access non-existent material.');
             $this->request->redirect(Route::get('materials')->uri());
-        }
+        } */
 
+        if(!ACL::Post('delete',$material)){
+          throw HTTP_Exception::factory(403,'Access denied');
+        }
+        $action=Route::get('material')->uri(array(
+                                        'action' => $this->request->action(),
+                                        'id' => $material->id
+        ));
+        
         $this->title = __('Delete :title', array(':title' => $material->title));
 
         $view = View::factory('form/confirm')

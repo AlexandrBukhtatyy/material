@@ -21,6 +21,8 @@ class Model_Material extends ORM{//ORM
     /** @type integer ADMIN_ROLE Admin role ID */
     const ADMIN_ROLE = 4;
     
+    public $type='material';
+    
     protected $_post_type = 'admin/material';
     protected $_primary_key="id";
     protected $_table_name="materials";
